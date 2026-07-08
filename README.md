@@ -1,4 +1,4 @@
-# Rate Limiter Library
+# Rate Limiter Playground
  
 Four rate-limiting algorithms behind one interface, plus a traffic generator and
 a harness that measures correctness and memory empirically — so the trade-offs
@@ -73,6 +73,29 @@ The headline: **Fixed Window leaks to exactly 2.00x under the boundary attack**,
 Sliding Log is exact but ~30x the per-client memory, and Sliding Counter buys
 nearly-exact behavior for a tiny constant footprint.
  
+## Notes on Windows Terminals
+
+The console tables use Unicode box-drawing characters (`┌─┬─┐`, etc.) for clean,
+auto-sized borders. This was tested across terminals, and one platform-specific
+quirk is worth documenting:
+
+On legacy `cmd.exe` with the default codepage, the outer table borders render
+correctly but the header divider line (`├─┼─┤`) can silently drop — a console
+encoding limitation, not a bug in the output logic. The underlying data,
+column widths, and alignment are unaffected either way.
+
+**Fix:** switch the console to UTF-8 before running the script:
+
+```bash
+chcp 65001
+python3 simulate.py
+```
+
+Windows Terminal (and PowerShell 7+) render everything correctly out of the
+box and don't need this step. This was caught and verified by reproducing
+the issue on `cmd.exe`, confirming the root cause was the codepage rather
+than the script, and validating the `chcp 65001` fix end-to-end.
+
 ## Porting to C++/Java
  
 The interface is deliberately thin. `RateLimiter` -> an abstract base /
